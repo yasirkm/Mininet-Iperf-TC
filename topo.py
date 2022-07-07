@@ -32,10 +32,37 @@ class tugas2_1301204395(Topo):
             }
         }
 
-        for router, param in routers_param:
+        hosts_param = {
+            'PC0' : {
+                'ip' : '192.168.11.130/25',
+                'defaultRoute' : '192.168.11.129/25'
+            },
+            'PC1' : {
+                'ip' : '192.168.12.130/26',
+                'defaultRoute' : '192.168.12.129/26'
+            },
+            'PC2' : {
+                'ip' : '192.168.11.2/25',
+                'defaultRoute' : '192.168.11.1/25'
+            },
+            'PC3' : {
+                'ip' : '192.168.10.130/25',
+                'defaultRoute' : '192.168.10.129/25'
+            },
+            'PC6' : {
+                'ip' : '192.168.12.2/25',
+                'defaultRoute' : '192.168.12.1/25'
+            },
+            'PC7' : {
+                'ip' : '192.168.10.2/25',
+                'defaultRoute' : '192.168.10.1/25'
+            }
+        }
+
+        for router, param in routers_param.items():
             self.addNode(router, **param)
         
-        for i in (x for x in range(8) if x not in (4,5)):
-            self.addHost(f'PC{i}')
+        for host, param in hosts_param.items():
+            self.addHost(host, **param)
 
         
