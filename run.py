@@ -18,7 +18,7 @@ def main():
 
     with Iperf_Server(net, 'PC7') as server:
         client = net['PC1']
-        routers = (net[router] for router in ('Router1', 'Router2', 'Router3', 'Router4', 'Router5', 'Router6'))
+        routers = tuple(net[router] for router in ('Router1', 'Router2', 'Router3', 'Router4', 'Router5', 'Router6'))
         controller = net['c0']
 
         cap_file = 'tugas2_1301204395.pcap'
