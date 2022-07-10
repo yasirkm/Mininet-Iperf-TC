@@ -1,3 +1,5 @@
+from time import sleep
+from os import system
 
 from mininet.net import Mininet
 from mininet.cli import CLI
@@ -14,6 +16,20 @@ def main():
     info('Enabling Routing\n\n')
     enable_routing(net)
     info('\n\n')
+
+    with Iperf_Server(net, 'PC7') as server:
+        client = net['PC1']
+        routers = (net[router] for router in ('Router1', 'Router2', 'Router3', 'Router4', 'Router5', 'Router6'))
+        controller = net['c0']
+
+        cap_file = 'tugas2_1301204395.pcap'
+
+        info('Testing Iperf\n\n')
+        generate_tcp_traffic(server, client, save_cap=True, cap_file=cap_file)
+        controller.cmd(f'wireshark {cap_file}&')
+        info('\n\n')
+
+
 
     CLI(net)
     net.stop()
@@ -79,6 +95,24 @@ def generate_tcp_traffic(server, client, time=10, cap_num=300, save_cap=False, c
     else:
         info(server.waitOutput())
     info('\n')
+
+def generate_delay_traffic(server, client, routers, time=5, save_cap=False, delays=('20ms','40ms','60ms','80ms','100ms')):   # CLO 4
+    '''
+        Generate tcp traffic(s) for each delay
+    '''
+    def change_delay(router, delay):
+        'Change the queue delay for every interface on the router'
+        for intf in router.intfNames():
+            router.cmd(f'tc qdisc del dev {intf} root')
+            router.cmd(f'tc qdisc add dev {intf} root handle 1: netem delay {delay}')
+    
+    for delay in delays:
+        for router in routers:  # Change the queue delay delay on all routers
+            change_delay(router, delay)
+        info(f'\nTraffic for queue delay {delay} packets\n\n')
+        routers[0].cmdPrint('tc qdisc')
+        info('\n')
+        generate_tcp_traffic(server=server, client=client, time=time, save_cap=save_cap, cap_file=f'delay_{delay}.pcap')
 
 class Iperf_Server():
     '''
