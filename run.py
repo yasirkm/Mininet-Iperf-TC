@@ -1,5 +1,4 @@
 from time import sleep
-from os import system
 
 from mininet.net import Mininet
 from mininet.cli import CLI
@@ -29,6 +28,9 @@ def main():
         controller.cmd(f'wireshark {cap_file}&')
         info('\n\n')
 
+        info('Generating Delay Traffic\n\n')
+        generate_delay_traffic(server, client, routers)
+        info('\n\n')
 
 
     CLI(net)
