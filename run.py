@@ -59,6 +59,44 @@ def enable_routing(net):
     net.pingAll()
     info('\n')
 
+def generate_tcp_traffic(server, client, time=10, cap_num=300, save_cap=False, cap_file='1301204395.pcap'):   # CLO 3
+    '''
+        Generate tcp traffic with iperf
+    '''
+    read_count=20
+
+    if save_cap:
+        server.sendCmd(f'tcpdump tcp -c {cap_num} -w {cap_file}')
+    else:
+        server.sendCmd(f'tcpdump tcp -c {read_count}')
+
+    client.cmdPrint(f'iperf -c {server.IP()} -t {time} -i 1')
+    info('\n')
+
+    if save_cap:
+        server.waitOutput()
+        server.cmdPrint(f'tcpdump -c {read_count} -r {cap_file}')
+    else:
+        info(server.waitOutput())
+    info('\n')
+
+class Iperf_Server():
+    '''
+        Context manager for running iperf server
+    '''
+    def __init__(self, net, server):
+        'Initiate server node'
+        self.server = net[server]
+
+    def __enter__(self):
+        'Run iperf server process on server node'
+        self.server.cmd('iperf -s &')
+        sleep(1)
+        return self.server
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        'Close iperf process'
+        self.server.cmd('kill %iperf')
 
 if __name__ == '__main__':
     main()
