@@ -1,4 +1,3 @@
-from collections import defaultdict
 from itertools import combinations
 
 from mininet.topo import Topo
